@@ -319,8 +319,8 @@ const Q = new URLSearchParams(location.search);
 const CONFIG = {
   API: {
     nursery: Q.get('api') ?? 'https://script.google.com/macros/s/AKfycbx-LIc65wCiM4I99LIS3C2bpspdI5hhJgCxvw4hcvwJuBvwF-P3eijIVFnA_gDF04_Z/exec',
-    k3:      Q.get('k3')  ?? '',   // alamat /exec SENSASI
-    enviro:  Q.get('env') ?? ''    // alamat /exec EnviroSync
+    k3:      Q.get('k3')  ?? 'https://script.google.com/macros/s/AKfycbySUd2A54Jxo6nBJio2mwk8cRTr11x6yBVkFxg5QOmvSvvole7_LSZTd7b9WoOIdT_g/exec',   // alamat /exec SENSASI
+    enviro:  Q.get('env') ?? 'https://script.google.com/macros/s/AKfycbwSj5jdTFE-y6xwPPnof9j02obllesxNB6JpGh5n5bfp5M9d4LWcm5SVf2Kjzxcv0QmbQ/exec'    // alamat /exec EnviroSync
   },
   KUNCI: Q.get('k') || '',
   HANYA: Q.get('app') || '',       // ?app=k3 hanya tampilkan K3
