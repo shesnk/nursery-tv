@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Layar Nursery - PT Arutmin Indonesia Tambang Senakin</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --forest:#1F4D36; --leaf:#4F8A3C; --sage:#DDE5CF; --paper:#FFFDF6; --line:#D5CFB8;
+  --ink:#1E2A22; --muted:#3F5A47; --soft:#4D5E50; --orange:#E8742B; --amber:#F6B26B; --blue:#1D4E89;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden;background:var(--sage);font-family:'Inter',system-ui,sans-serif;color:var(--ink)}
+body.sepi{cursor:none}
+#viewport{position:fixed;inset:0;overflow:hidden}
+#stage{position:absolute;left:50%;top:50%;width:1920px;height:1080px;transform-origin:center center;background:var(--sage);overflow:hidden}
+
+/* header */
+#top{position:absolute;left:0;right:0;top:0;height:104px;background:var(--forest);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 48px;gap:32px}
+.brand{display:flex;align-items:center;gap:22px;min-width:0}
+.logo{width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;flex:none}
+.kicker{font-size:20px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--amber)}
+#judul{font-family:'Fraunces',Georgia,serif;font-size:46px;font-weight:800;line-height:1.05;white-space:nowrap}
+.kanan{display:flex;align-items:center;gap:36px}
+.jam{text-align:right}
+#jam{font-family:'Fraunces',Georgia,serif;font-size:48px;font-weight:700;line-height:1}
+#tgl{font-size:21px;color:#DDE9D0;margin-top:4px}
+#chip{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.12);border-radius:999px;padding:10px 22px;font-size:21px;font-weight:600;max-width:560px}
+#chip i{width:14px;height:14px;border-radius:50%;flex:none;background:#5BD17A}
+#chip span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#chip.offline i{background:var(--amber)}
+#chip.demo i{background:#FF8A5B}
+
+/* scene area */
+#scenes{position:absolute;left:0;right:0;top:104px;bottom:72px;padding:24px 40px}
+.scene{width:100%;height:100%;animation:masuk .5s ease-out both}
+@keyframes masuk{from{opacity:0}to{opacity:1}}
+@keyframes naik{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
+@keyframes tumbuhX{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes tumbuhY{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes sapu{from{stroke-dasharray:0 var(--c)}}
+@keyframes zoom{from{transform:scale(1)}to{transform:scale(1.07)}}
+.rise{animation:naik .65s ease-out both;animation-delay:calc(var(--i,0) * 90ms)}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:22px;padding:30px 38px;box-shadow:0 3px 0 rgba(31,77,54,.08)}
+.judulpanel{font-size:24px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--forest)}
+.muted{color:var(--soft)}
+
+/* ringkasan */
+.ringkas{display:grid;grid-template-columns:1fr 760px;gap:28px;height:100%}
+.kiri{display:flex;flex-direction:column;gap:24px;min-height:0}
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:24px;flex:1;min-height:0}
+.tile{border-radius:22px;padding:30px 38px;display:flex;flex-direction:column;justify-content:center;gap:2px;background:#F0F4E4;border:1px solid #D8E0C2}
+.tile.hero{background:var(--forest);color:#fff;border-color:var(--forest)}
+.tile .lab{font-size:28px;font-weight:600;color:var(--muted)}
+.tile.hero .lab{color:#DDE9D0}
+.tile .num{font-family:'Fraunces',Georgia,serif;font-size:136px;font-weight:800;line-height:1.05;color:var(--forest)}
+.tile.hero .num{color:#fff}
+.tile .sat{font-size:26px;color:var(--soft)}
+.tile.hero .sat{color:var(--amber)}
+.strip{display:flex;align-items:center;gap:28px;height:132px;flex:none}
+.strip .judulpanel{width:300px;line-height:1.25}
+.chips{display:flex;gap:20px;flex:1}
+.chipk{flex:1;background:#FFF1DE;border-radius:16px;padding:14px 22px;display:flex;flex-direction:column;gap:2px}
+.chipk b{font-family:'Fraunces',Georgia,serif;font-size:46px;color:#7A3F0C;line-height:1.1}
+.chipk span{font-size:24px;font-weight:600;color:#6B3A10}
+.donutpanel{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:30px}
+.donutpanel svg{flex:none}
+.seg{animation:sapu 1.1s ease-out both}
+.legenda{width:100%;display:flex;flex-direction:column;gap:12px}
+.lg{display:flex;align-items:center;gap:16px;font-size:28px}
+.lg i{width:26px;height:26px;border-radius:7px;flex:none}
+.lg .n{flex:1;font-weight:600}
+.lg .v{font-weight:700}
+.lg .p{width:84px;text-align:right;color:var(--soft)}
+
+/* jenis */
+.jenis{height:100%;display:flex;flex-direction:column;gap:14px}
+.jhead{display:flex;justify-content:space-between;align-items:center}
+.jrows{display:flex;flex-direction:column;gap:12px;flex:1;justify-content:space-between}
+.jr{display:grid;grid-template-columns:56px 380px 1fr 190px;align-items:center;gap:22px}
+.rk{width:48px;height:48px;border-radius:50%;background:var(--forest);color:#fff;font-weight:700;font-size:24px;display:flex;align-items:center;justify-content:center}
+.jn{font-size:34px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.track{height:40px;background:#EEF1E1;border-radius:12px;overflow:hidden}
+.bar{height:100%;border-radius:12px;transform-origin:left center;animation:tumbuhX .9s ease-out both;animation-delay:calc(var(--i,0) * 70ms)}
+.jv{font-family:'Fraunces',Georgia,serif;font-size:42px;font-weight:700;text-align:right;color:var(--forest)}
+.legk{display:flex;gap:26px;font-size:24px;font-weight:600;color:var(--muted)}
+.legk span{display:flex;align-items:center;gap:10px}
+.legk i{width:22px;height:22px;border-radius:6px}
+.catatan{font-size:23px;color:var(--soft)}
+
+/* tren */
+.tren{height:100%;display:flex;flex-direction:column;gap:18px}
+.trensvg{flex:1;min-height:0}
+.trensvg svg{width:100%;height:100%;display:block}
+.bx{transform-box:fill-box;transform-origin:center bottom;animation:tumbuhY .9s ease-out both}
+.stat3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;height:132px;flex:none}
+.st{background:#F0F4E4;border-radius:18px;padding:16px 28px;display:flex;flex-direction:column;justify-content:center}
+.st span{font-size:24px;font-weight:600;color:var(--muted)}
+.st b{font-family:'Fraunces',Georgia,serif;font-size:50px;color:var(--forest);line-height:1.1}
+
+/* sorotan */
+.spot{display:grid;grid-template-columns:860px 1fr;gap:28px;height:100%}
+.spotfoto{position:relative;border-radius:26px;overflow:hidden;background:#EAF1DD;border:1px solid var(--line)}
+.spotfoto img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;animation:zoom 18s ease-out both}
+.fb{position:absolute;inset:0;align-items:center;justify-content:center;background:#EAF1DD}
+.spottext{display:flex;flex-direction:column;gap:20px;justify-content:center}
+.kat{align-self:flex-start;background:var(--forest);color:#fff;border-radius:999px;padding:8px 24px;font-size:24px;font-weight:600}
+.nama{font-family:'Fraunces',Georgia,serif;font-size:100px;font-weight:800;line-height:1.02;color:var(--forest)}
+.ilmiah{font-size:38px;font-style:italic;color:var(--soft)}
+.fakta{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:6px}
+.fk{background:#F0F4E4;border-radius:16px;padding:16px 24px}
+.fk span{display:block;font-size:22px;font-weight:600;color:var(--muted)}
+.fk b{font-family:'Fraunces',Georgia,serif;font-size:44px;color:var(--forest)}
+.manfaat{font-size:29px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;overflow:hidden}
+.hit{font-size:22px;color:var(--soft)}
+
+/* aktivitas */
+.akt{display:grid;grid-template-columns:1fr 720px;gap:28px;height:100%}
+.list{display:flex;flex-direction:column;gap:12px;margin-top:18px}
+.krow{display:grid;grid-template-columns:150px 1fr 190px;gap:20px;align-items:center;padding:14px 0;border-bottom:1px solid #E5E0CB}
+.krow:last-child{border-bottom:0}
+.kt{background:#E4ECD2;border-radius:14px;padding:8px 10px;text-align:center;font-size:22px;font-weight:700;color:var(--forest);line-height:1.2}
+.kn{font-size:31px;font-weight:700;line-height:1.2}
+.ks{font-size:24px;color:var(--soft);margin-top:2px}
+.kj{font-family:'Fraunces',Georgia,serif;font-size:38px;font-weight:700;text-align:right;color:var(--forest)}
+.kj small{font-family:'Inter',sans-serif;font-size:21px;font-weight:500;color:var(--soft)}
+.pg{display:flex;flex-direction:column;gap:18px;margin-top:18px}
+.pgi{background:#FFF1DE;border-radius:16px;padding:18px 24px}
+.pgi small{display:block;font-size:21px;font-weight:700;letter-spacing:.08em;color:#8A4A12;text-transform:uppercase;margin-bottom:6px}
+.pgi p{font-size:29px;line-height:1.35;color:#3A2A14}
+.kosong{font-size:28px;color:var(--soft);margin-top:24px}
+
+/* galeri */
+.gal{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:20px;height:100%}
+.gt{position:relative;border-radius:22px;overflow:hidden;background:repeating-linear-gradient(45deg,#E6EBD8 0,#E6EBD8 12px,#DCE4CB 12px,#DCE4CB 24px);border:1px solid var(--line)}
+.gt img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.gcap{position:absolute;left:0;right:0;bottom:0;padding:50px 24px 20px;background:linear-gradient(to top,rgba(14,32,22,.88),rgba(14,32,22,0));color:#fff}
+.gcap b{display:block;font-size:30px;line-height:1.2}
+.gcap span{font-size:22px;color:#E6EFD9}
+.gtp{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:600;color:var(--muted)}
+
+/* agenda */
+.agd{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;align-content:start}
+.ag{display:flex;flex-direction:column;gap:6px}
+.ag b{font-size:34px;line-height:1.2}
+.ag p{font-size:26px;color:var(--soft)}
+.ag .w{margin-top:6px;font-size:24px;font-weight:700;color:var(--forest)}
+
+/* siklus */
+.siklus{height:100%;display:flex;flex-direction:column;gap:24px}
+.langkah{position:relative;margin-top:30px}
+.garis{position:absolute;top:54px;left:8%;right:8%;height:4px;background:#B9C7A5;transform-origin:left center;animation:tumbuhX 1.4s ease-out both}
+.lgrid{position:relative;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px}
+.ls{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
+.lb{width:110px;height:110px;border-radius:50%;background:var(--forest);color:#fff;font-family:'Fraunces',Georgia,serif;font-size:52px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.lb.t{background:var(--amber);color:#3B2A10}
+.ls b{font-size:38px;color:var(--forest)}
+.ls span{font-size:27px;line-height:1.3;color:var(--muted)}
+.k3{flex:1;display:flex;flex-direction:column;gap:16px}
+.k3g{display:grid;grid-template-columns:1fr 1fr;gap:20px 40px;align-content:space-evenly;flex:1}
+.k3i{display:flex;gap:22px;align-items:center;font-size:36px;line-height:1.3}
+.k3i svg{width:56px;height:56px}
+.k3p{background:#E6EEF7;border-radius:14px;padding:14px 26px;font-size:29px;color:#123560}
+
+/* footer */
+#foot{position:absolute;left:0;right:0;bottom:0;height:72px;display:flex;align-items:center;gap:28px;padding:0 40px}
+#dots{display:flex;gap:2px}
+#dots button{width:44px;height:44px;border:0;background:none;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:50%}
+#dots button i{width:14px;height:14px;border-radius:50%;background:#9FB090;transition:all .25s}
+#dots button.on i{width:34px;border-radius:8px;background:var(--forest)}
+#dots button:focus-visible{outline:3px solid var(--blue)}
+#prog{flex:1;height:8px;border-radius:5px;background:#C9D6B6;overflow:hidden}
+#progbar{height:100%;width:0;background:var(--forest);border-radius:5px}
+#hint{font-size:21px;color:var(--soft);white-space:nowrap}
+#hint b{color:var(--forest)}
+#jedaChip{display:none;font-size:21px;font-weight:700;color:#fff;background:var(--orange);color:#2B1708;border-radius:999px;padding:6px 18px}
+body.jeda #jedaChip{display:inline-block}
+#toast{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);z-index:5;background:var(--forest);color:#fff;font-size:24px;padding:10px 30px;border-radius:999px;transition:opacity .6s;opacity:0;pointer-events:none;white-space:nowrap}
+#toast.on{opacity:1}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="viewport">
+<div id="stage">
+  <header id="top">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">
+        <svg width="38" height="38" viewBox="0 0 120 150"><path d="M60 128 C60 100 60 70 60 40" stroke="#fff" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M60 88 C38 88 24 74 22 54 C46 54 58 66 60 88Z" fill="#9AD17E"/><path d="M60 68 C82 68 98 54 100 34 C76 34 62 46 60 68Z" fill="#C6E8A9"/><path d="M60 42 C50 30 52 16 60 4 C68 16 70 30 60 42Z" fill="#7CB75C"/></svg>
+      </div>
+      <div>
+        <div class="kicker">Nursery · PT Arutmin Indonesia Tambang Senakin</div>
+        <div id="judul">Memuat…</div>
+      </div>
+    </div>
+    <div class="kanan">
+      <div id="chip" class="demo"><i></i><span id="chipTeks">Menghubungkan…</span></div>
+      <div class="jam"><div id="jam">--.--</div><div id="tgl">&nbsp;</div></div>
+    </div>
+  </header>
+
+  <main id="scenes" aria-live="off"></main>
+
+  <footer id="foot">
+    <div id="dots" role="tablist" aria-label="Pilih layar"></div>
+    <div id="prog"><div id="progbar"></div></div>
+    <span id="jedaChip">JEDA</span>
+    <div id="hint"><b>← →</b> ganti layar · <b>Spasi</b> jeda · <b>F</b> layar penuh · <b>R</b> segarkan</div>
+  </footer>
+  <div id="toast" role="status"></div>
+</div>
+</div>
+<noscript>Halaman ini memerlukan JavaScript.</noscript>
+
+<script>
+(() => {
+'use strict';
+
+/* ================= PENGATURAN ================= */
+const Q = new URLSearchParams(location.search);
+const CONFIG = {
+  // Alamat /exec Nursery App (deployment web app). Bisa ditimpa lewat ?api=...
+  API_URL: Q.get('api') ?? 'https://script.google.com/macros/s/AKfycbx-LIc65wCiM4I99LIS3C2bpspdI5hhJgCxvw4hcvwJuBvwF-P3eijIVFnA_gDF04_Z/exec',
+  // Kunci layar (sama dengan properti skrip TV_KEY). Bisa lewat ?k=...
+  KUNCI: Q.get('k') || '',
+  DURASI: Math.max(6, Number(Q.get('d')) || 18),   // detik per layar (?d=25)
+  REFRESH: 60,                                      // detik antar pembaruan data
+  TIMEOUT: 25,                                      // detik batas tunggu
+  DEMO: Q.get('demo') === '1'                       // paksa data contoh
+};
+const TZ = 'Asia/Makassar';
+
+/* ================= UTILITAS ================= */
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt = n => Number(n || 0).toLocaleString('id-ID');
+const BLN = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+const fmtTgl = t => { const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(t || ''); return m ? `${+m[3]} ${BLN[+m[2]-1]} ${m[1]}` : esc(t); };
+const jamStr = d => d.toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit', timeZone:TZ});
+
+const WARNA = {'Fast Growing':'#6FA84B','Lokal':'#1F4D36','Buah/MPTS':'#E8742B','Cover Crop':'#1D4E89','Lainnya':'#8A8F7A'};
+const CAD = ['#7B4F9D','#2A9D8F','#B8860B','#A23B5A'];
+const warnaCad = {};
+const warna = k => WARNA[k] || warnaCad[k] || (warnaCad[k] = CAD[Object.keys(warnaCad).length % CAD.length]);
+
+function driveId(u){ const s = String(u || ''); const m = s.match(/\/d\/([\w-]+)/) || s.match(/[?&]id=([\w-]+)/); return m ? m[1] : ''; }
+const fotoUrl = (u, w = 1200) => { const id = driveId(u); return id ? `https://drive.google.com/thumbnail?id=${id}&sz=w${w}` : ''; };
+
+const bibitSvg = (w = 300) => `<svg width="${w}" height="${w*1.25}" viewBox="0 0 120 150" aria-hidden="true">
+<path d="M60 108 C60 84 60 64 60 42" stroke="#2F6B3A" stroke-width="4" fill="none" stroke-linecap="round"/>
+<path d="M60 74 C40 74 28 62 26 46 C46 46 58 56 60 74Z" fill="#4F8A3C"/>
+<path d="M60 60 C80 60 94 48 96 32 C76 32 62 42 60 60Z" fill="#6FA84B"/>
+<path d="M60 44 C52 34 54 22 60 12 C66 22 68 34 60 44Z" fill="#3E7A34"/>
+<path d="M32 106 L88 106 L81 142 L39 142 Z" fill="#7A5230"/><ellipse cx="60" cy="106" rx="28" ry="5" fill="#4A3220"/></svg>`;
+
+const centang = `<svg width="40" height="40" viewBox="0 0 20 20" aria-hidden="true" style="flex:none"><circle cx="10" cy="10" r="10" fill="#1D4E89"/><path d="M5.5 10.5l3 3 6-6.5" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
+/* ================= DATA CONTOH (hanya bila belum tersambung) ================= */
+function dataContoh(){
+  const jenis = [['Sengon Laut','Fast Growing',18420],['Eucalyptus','Fast Growing',15210],['Trembesi','Fast Growing',9830],['Mahoni','Lokal',8640],['Sungkai','Lokal',7120],['Dadap','Cover Crop',5560],['Akasia','Fast Growing',4210],['Johar','Lokal',3340],['Jabon','Fast Growing',2780],['Ketapang','Buah/MPTS',1990],['Kelor','Buah/MPTS',1240]]
+    .map(([j,k,s]) => ({jenis:j, kategori:k, stok:s}));
+  const total = jenis.reduce((a,b)=>a+b.stok,0);
+  const kat = {}; jenis.forEach(o => kat[o.kategori] = (kat[o.kategori]||0) + o.stok);
+  const now = new Date(); const tren = [];
+  const pm = [4200,6100,3500,8200,2800,5400,7600,3100,9000,4400,6800,5200];
+  const pk = [3100,2400,5200,3900,4800,2200,6100,4400,3300,7200,3800,4600];
+  for (let i = 11; i >= 0; i--) { const d = new Date(now.getFullYear(), now.getMonth()-i, 1);
+    tren.push({ym:`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`, masuk:pm[11-i], keluar:pk[11-i]}); }
+  return {
+    ok:true,
+    bulan:{masuk:6800, keluar:4600, penanaman:3100, penyulaman:1100, ppm:400},
+    stok:{total, jumlahJenis:jenis.length, perJenis:jenis,
+      perKategori:Object.keys(kat).map(k=>({kategori:k, stok:kat[k]})).sort((a,b)=>b.stok-a.stok)},
+    tren,
+    kegiatan:[
+      {tanggal:'2026-11-09', kegiatan:'Penanaman', sub:'Reklamasi', lokasi:'[Lokasi contoh]', total:2400},
+      {tanggal:'2026-11-07', kegiatan:'Bibit masuk', sub:'Sapih', lokasi:'Nursery', total:3200},
+      {tanggal:'2026-11-05', kegiatan:'Penyulaman', sub:'Reklamasi', lokasi:'[Lokasi contoh]', total:700},
+      {tanggal:'2026-11-03', kegiatan:'Bibit keluar', sub:'PPM', lokasi:'[Lokasi contoh]', total:400}],
+    galeri:[
+      {tanggal:'2026-11-08', nama:'Foto kegiatan contoh', lokasi:'Nursery', foto:''},
+      {tanggal:'2026-11-06', nama:'Foto kegiatan contoh', lokasi:'Nursery', foto:''},
+      {tanggal:'2026-11-04', nama:'Foto kegiatan contoh', lokasi:'Lahan reklamasi', foto:''}],
+    kamus:[
+      {nama:'Sengon Laut', ilmiah:'Falcataria moluccana', kategori:'Fast Growing', usia:'3-4 bulan', tinggi:'30-50 cm',
+       manfaat:'Mempercepat pembentukan tutupan vegetasi, memberikan naungan, menambah bahan organik melalui serasah, serta membantu meningkatkan nitrogen tanah.', foto:''},
+      {nama:'Sengon Buto', ilmiah:'Enterolobium cyclocarpum', kategori:'Fast Growing', usia:'3-6 bulan', tinggi:'30-50 cm',
+       manfaat:'Membantu pembentukan tutupan vegetasi, memberikan naungan, menghasilkan serasah daun, serta meningkatkan kandungan nitrogen tanah.', foto:''}],
+    info:[{tanggal:'2026-11-09', teks:'[Contoh pengumuman] Pengambilan bibit untuk penanaman ditulis di buku keluar sebelum pukul 10.00.'}],
+    agenda:[
+      {nama:'Pemupukan bibit', rincian:'Seluruh bedeng', frekuensi:'Mingguan', hari:'Senin', jam:'07.30'},
+      {nama:'Penyiraman', rincian:'Bedeng semai dan polybag', frekuensi:'Harian', hari:'Setiap hari', jam:'07.00'}]
+  };
+}
+
+/* ================= LAYAR (SCENES) ================= */
+let spot = -1;
+
+function rRingkasan(d){
+  const b = d.bulan, s = d.stok, tot = s.total || 1;
+  const tiles = [['Stok bibit saat ini', s.total, 'batang', 'hero'], ['Masuk bulan ini', b.masuk, 'batang', ''], ['Keluar bulan ini', b.keluar, 'batang', ''], ['Jenis tanaman', s.jumlahJenis, 'jenis', '']];
+  const R = 150, C = 2 * Math.PI * R; let acc = 0;
+  const segs = s.perKategori.map((k, i) => {
+    const len = C * k.stok / tot;
+    const el = `<circle class="seg" cx="230" cy="230" r="${R}" fill="none" stroke="${warna(k.kategori)}" stroke-width="66" stroke-dasharray="${len} ${C-len}" stroke-dashoffset="${-acc}" transform="rotate(-90 230 230)" style="--c:${C};animation-delay:${i*180}ms"/>`;
+    acc += len; return el;
+  }).join('');
+  const leg = s.perKategori.slice(0,5).map(k => `<div class="lg"><i style="background:${warna(k.kategori)}"></i><span class="n">${esc(k.kategori)}</span><span class="v">${fmt(k.stok)}</span><span class="p">${Math.round(k.stok*100/tot)}%</span></div>`).join('');
+  return `<div class="ringkas">
+  <div class="kiri">
+    <div class="tiles">${tiles.map((t,i) => `<div class="tile rise ${t[3]}" style="--i:${i}"><div class="lab">${t[0]}</div><div class="num" data-count="${t[1]}">0</div><div class="sat">${t[2]}</div></div>`).join('')}</div>
+    <div class="strip rise" style="--i:4"><div class="judulpanel">Keluar bulan ini<br>menurut kegiatan</div>
+      <div class="chips">
+        <div class="chipk"><b>${fmt(b.penanaman)}</b><span>Penanaman</span></div>
+        <div class="chipk"><b>${fmt(b.penyulaman)}</b><span>Penyulaman</span></div>
+        <div class="chipk"><b>${fmt(b.ppm)}</b><span>PPM</span></div>
+      </div></div>
+  </div>
+  <div class="panel donutpanel rise" style="--i:2">
+    <div class="judulpanel">Stok menurut kategori</div>
+    <svg width="400" height="400" viewBox="0 0 460 460" role="img" aria-label="Diagram donat stok per kategori">
+      <circle cx="230" cy="230" r="${R}" fill="none" stroke="#EEF1E1" stroke-width="66"/>${segs}
+      <text x="230" y="226" text-anchor="middle" font-family="Fraunces, Georgia, serif" font-size="64" font-weight="800" fill="#1F4D36">${fmt(s.total)}</text>
+      <text x="230" y="270" text-anchor="middle" font-family="Inter, sans-serif" font-size="28" fill="#4D5E50">batang</text></svg>
+    <div class="legenda">${leg}</div>
+  </div></div>`;
+}
+
+function rJenis(d){
+  const list = d.stok.perJenis.slice(0, 10), max = list[0] ? list[0].stok : 1;
+  const kats = [...new Set(list.map(o => o.kategori))];
+  const rows = list.map((o, i) => `<div class="jr rise" style="--i:${i*0.5}"><div class="rk">${i+1}</div><div class="jn">${esc(o.jenis)}</div>
+    <div class="track"><div class="bar" style="width:${Math.max(2, o.stok*100/max)}%;background:${warna(o.kategori)};--i:${i}"></div></div>
+    <div class="jv">${fmt(o.stok)}</div></div>`).join('');
+  return `<div class="panel jenis"><div class="jhead"><div class="judulpanel">10 jenis dengan stok terbanyak</div>
+    <div class="legk">${kats.map(k => `<span><i style="background:${warna(k)}"></i>${esc(k)}</span>`).join('')}</div></div>
+    <div class="jrows">${rows}</div>
+    <div class="catatan">Menampilkan ${list.length} dari ${fmt(d.stok.jumlahJenis)} jenis · stok = total masuk dikurangi total keluar per jenis</div></div>`;
+}
+
+function niceStep(m){ const raw = m / 4 || 1, p = Math.pow(10, Math.floor(Math.log10(raw))), f = raw / p; return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 5 ? 5 : 10) * p; }
+function rTren(d){
+  const W = 1700, H = 500, L = 110, T = 30, Bm = 66, n = d.tren.length;
+  const max = Math.max(1, ...d.tren.flatMap(t => [t.masuk, t.keluar]));
+  const step = niceStep(max), top = Math.ceil(max / step) * step;
+  const y = v => T + (H - T - Bm) * (1 - v / top);
+  let g = '';
+  for (let v = 0; v <= top + 0.1; v += step) {
+    g += `<line x1="${L}" x2="${W}" y1="${y(v)}" y2="${y(v)}" stroke="#E5E0CB" stroke-width="2"/><text x="${L-14}" y="${y(v)+8}" text-anchor="end" font-size="22" fill="#4D5E50" font-family="Inter, sans-serif">${fmt(v)}</text>`;
+  }
+  const gw = (W - L) / n, bw = 46;
+  let bars = '';
+  d.tren.forEach((t, i) => {
+    const cx = L + gw * i + gw / 2, m = +t.ym.slice(5, 7) - 1;
+    const lab = BLN[m] + (m === 0 || i === 0 ? ` ${t.ym.slice(2,4)}` : '');
+    [['masuk','#2F6B3A',-bw-6],['keluar','#F0A04B',6]].forEach(([k, c, dx], j) => {
+      const v = t[k], h = (H - T - Bm) * v / top, x = cx + dx;
+      bars += `<rect class="bx" x="${x}" y="${y(v)}" width="${bw}" height="${Math.max(0,h)}" rx="6" fill="${c}" style="animation-delay:${i*60+j*30}ms"/>`;
+      if (v > 0) bars += `<text x="${x+bw/2}" y="${y(v)-8}" text-anchor="middle" font-size="17" font-weight="600" fill="#1E2A22" font-family="Inter, sans-serif">${fmt(v)}</text>`;
+    });
+    bars += `<text x="${cx}" y="${H-24}" text-anchor="middle" font-size="22" font-weight="600" fill="#3F5A47" font-family="Inter, sans-serif">${lab}</text>`;
+  });
+  const tm = d.tren.reduce((a, t) => a + t.masuk, 0), tk = d.tren.reduce((a, t) => a + t.keluar, 0);
+  const mx = d.tren.reduce((a, t) => t.keluar > a.keluar ? t : a, d.tren[0]);
+  const bn = mx ? `${BLN[+mx.ym.slice(5,7)-1]} ${mx.ym.slice(0,4)}` : '-';
+  return `<div class="tren"><div class="panel" style="flex:1;display:flex;flex-direction:column;gap:6px;min-height:0">
+    <div class="jhead"><div class="judulpanel">12 bulan terakhir (batang)</div>
+      <div class="legk"><span><i style="background:#2F6B3A"></i>Masuk</span><span><i style="background:#F0A04B"></i>Keluar</span></div></div>
+    <div class="trensvg"><svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Grafik batang bibit masuk dan keluar per bulan">${g}${bars}</svg></div></div>
+    <div class="stat3"><div class="st rise" style="--i:1"><span>Total masuk 12 bulan</span><b>${fmt(tm)} batang</b></div>
+    <div class="st rise" style="--i:2"><span>Total keluar 12 bulan</span><b>${fmt(tk)} batang</b></div>
+    <div class="st rise" style="--i:3"><span>Keluar tertinggi</span><b>${bn} · ${fmt(mx ? mx.keluar : 0)}</b></div></div></div>`;
+}
+
+function rSorotan(d){
+  const k = d.kamus[spot % d.kamus.length], url = fotoUrl(k.foto, 1400);
+  return `<div class="spot"><div class="spotfoto rise">${url ? `<img data-fb src="${url}" alt="${esc(k.nama)}">` : ''}
+    <div class="fb" style="display:${url ? 'none' : 'flex'}">${bibitSvg(260)}</div></div>
+    <div class="panel spottext rise" style="--i:2">
+      <div class="judulpanel">Kenali bibit kita</div>
+      ${k.kategori ? `<div class="kat">${esc(k.kategori)}</div>` : ''}
+      <div class="nama">${esc(k.nama)}</div><div class="ilmiah">${esc(k.ilmiah)}</div>
+      <div class="fakta"><div class="fk"><span>Usia siap tanam</span><b>${esc(k.usia || '-')}</b></div><div class="fk"><span>Tinggi siap tanam</span><b>${esc(k.tinggi || '-')}</b></div></div>
+      ${k.manfaat ? `<p class="manfaat">${esc(k.manfaat)}</p>` : ''}
+      <div class="hit">${(spot % d.kamus.length) + 1} dari ${d.kamus.length} jenis dalam Kamus Bibit</div></div></div>`;
+}
+
+function rAktivitas(d){
+  const rows = d.kegiatan.map((k, i) => {
+    const t = /^(\d{4})-(\d{2})-(\d{2})/.exec(k.tanggal || '');
+    return `<div class="krow rise" style="--i:${i*0.5}"><div class="kt">${t ? `${+t[3]} ${BLN[+t[2]-1]}<br>${t[1]}` : esc(k.tanggal)}</div>
+    <div><div class="kn">${esc(k.kegiatan)}${k.sub ? ' · ' + esc(k.sub) : ''}</div>${k.lokasi ? `<div class="ks">${esc(k.lokasi)}</div>` : ''}</div>
+    <div class="kj">${k.total ? fmt(k.total) + ' <small>btg</small>' : ''}</div></div>`; }).join('');
+  const info = d.info.map(p => `<div class="pgi"><small>${fmtTgl(p.tanggal)}</small><p>${esc(p.teks)}</p></div>`).join('');
+  return `<div class="akt"><div class="panel rise"><div class="judulpanel">Kegiatan terbaru</div>
+    ${rows ? `<div class="list">${rows}</div>` : '<div class="kosong">Belum ada kegiatan tercatat.</div>'}</div>
+    <div class="panel rise" style="--i:2"><div class="judulpanel">Pengumuman</div>
+    ${info ? `<div class="pg">${info}</div>` : '<div class="kosong">Tidak ada pengumuman aktif.</div>'}</div></div>`;
+}
+
+function rGaleri(d){
+  const pilih = d.galeri.slice(0, 6), n = pilih.length;
+  const cols = n <= 3 ? n : (n === 4 ? 2 : 3), rows = n <= 3 ? 1 : 2;
+  const tiles = pilih.map((g, i) => { const u = fotoUrl(g.foto, 1000);
+    return `<div class="gt rise" style="--i:${i}">${u ? `<img data-fb src="${u}" alt="${esc(g.nama)}">` : ''}<div class="gtp" style="display:${u ? 'none' : 'flex'}">Foto kegiatan</div>
+    <div class="gcap"><b>${esc(g.nama)}</b><span>${esc(g.lokasi)}${g.lokasi ? ' · ' : ''}${fmtTgl(g.tanggal)}</span></div></div>`; }).join('');
+  return `<div class="gal" style="grid-template-columns:repeat(${cols},minmax(0,1fr));grid-template-rows:repeat(${rows},minmax(0,1fr))">${tiles}</div>`;
+}
+
+function rAgenda(d){
+  return `<div class="panel rise"><div class="judulpanel">Agenda rutin nursery</div><div class="agd" style="margin-top:22px">${d.agenda.map((a, i) => `<div class="panel ag rise" style="--i:${i*0.5};padding:22px 28px;background:#F0F4E4;box-shadow:none"><b>${esc(a.nama)}</b>${a.rincian ? `<p>${esc(a.rincian)}</p>` : ''}<div class="w">${esc([a.frekuensi, a.hari, a.jam].filter(Boolean).join(' · '))}</div></div>`).join('')}</div></div>`;
+}
+
+function rSiklus(){
+  const L = [['Benih','Kumpulkan benih dan anakan'],['Semai','Tabur di bedeng semai'],['Sapih','Pindah ke polybag'],['Rawat','Siram, pupuk, tebas, dangir'],['Seleksi','Pilih bibit sehat dan siap'],['Tanam','Kirim ke lahan reklamasi']];
+  const K = ['Pakai APD: sepatu, sarung tangan, dan topi.','Cuci tangan setelah memupuk atau menyemprot.','Simpan pupuk dan bahan kimia di tempat tertutup.','Waspada ular, serangga, dan jalan licin saat hujan.'];
+  return `<div class="siklus"><div class="panel rise"><div class="judulpanel">Perjalanan satu bibit</div>
+    <div class="langkah"><div class="garis"></div><div class="lgrid">${L.map((l, i) => `<div class="ls rise" style="--i:${i+1}"><div class="lb ${i === 5 ? 't' : ''}">${i+1}</div><b>${l[0]}</b><span>${l[1]}</span></div>`).join('')}</div></div></div>
+    <div class="panel k3 rise" style="--i:3"><div class="judulpanel" style="color:#1D4E89">Aman di nursery</div>
+    <div class="k3g">${K.map(t => `<div class="k3i">${centang}<div>${t}</div></div>`).join('')}</div>
+    <div class="k3p">Melihat bahaya? Segera laporkan lewat Hazard Report.</div></div></div>`;
+}
+
+const SCENES = [
+  {id:'ringkasan', judul:'Ringkasan Stok Bibit', aktif:()=>true, render:rRingkasan},
+  {id:'jenis', judul:'Stok per Jenis Tanaman', aktif:d=>d.stok.perJenis.length>0, render:rJenis},
+  {id:'tren', judul:'Tren Bibit Masuk & Keluar', aktif:d=>d.tren.some(t=>t.masuk||t.keluar), render:rTren},
+  {id:'sorotan', judul:'Kamus Bibit', aktif:d=>d.kamus.length>0, render:rSorotan, sebelum(){ spot++; }},
+  {id:'aktivitas', judul:'Kegiatan & Pengumuman', aktif:d=>d.kegiatan.length>0||d.info.length>0, render:rAktivitas},
+  {id:'galeri', judul:'Galeri Kegiatan', aktif:d=>d.galeri.length>0, render:rGaleri},
+  {id:'agenda', judul:'Agenda Rutin', aktif:d=>d.agenda.length>0, render:rAgenda},
+  {id:'siklus', judul:'Perjalanan Satu Bibit', aktif:()=>true, render:rSiklus}
+];
+
+/* ================= STATE & TAMPILAN ================= */
+let data = null, status = 'demo', waktuData = null, galat = '', sigLama = '';
+let vis = [], idx = 0, mulai = performance.now(), jeda = false, sisa = 0;
+
+function normal(d){
+  d.bulan = Object.assign({masuk:0, keluar:0, penanaman:0, penyulaman:0, ppm:0}, d.bulan);
+  d.stok = Object.assign({total:0, jumlahJenis:0, perJenis:[], perKategori:[]}, d.stok);
+  ['tren','kegiatan','galeri','kamus','info','agenda'].forEach(k => { if (!Array.isArray(d[k])) d[k] = []; });
+  return d;
+}
+
+function countUp(n){
+  const to = +n.dataset.count || 0, t0 = performance.now(), dur = 1000;
+  (function f(t){ const k = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - k, 3);
+    n.textContent = fmt(Math.round(to * e)); if (k < 1) requestAnimationFrame(f); })(t0);
+}
+
+function tampil(i, {tetap = false} = {}){
+  if (!vis.length) return;
+  idx = ((i % vis.length) + vis.length) % vis.length;
+  const sc = vis[idx];
+  if (!tetap && sc.sebelum) sc.sebelum();
+  const el = document.createElement('section');
+  el.className = 'scene';
+  el.innerHTML = sc.render(data);
+  $('#scenes').replaceChildren(el);
+  el.querySelectorAll('img[data-fb]').forEach(img => {
+    const fb = img.nextElementSibling;
+    img.addEventListener('error', () => { img.remove(); if (fb) fb.style.display = 'flex'; });
+  });
+  el.querySelectorAll('[data-count]').forEach(countUp);
+  $('#judul').textContent = sc.judul;
+  document.querySelectorAll('#dots button').forEach((b, j) => { b.classList.toggle('on', j === idx); b.setAttribute('aria-selected', j === idx); });
+  if (!tetap) { mulai = performance.now(); sisa = 0; }
+}
+
+function bangunDots(){
+  $('#dots').innerHTML = vis.map((s, i) => `<button type="button" role="tab" aria-label="Layar ${i+1}: ${esc(s.judul)}" data-i="${i}"><i></i></button>`).join('');
+  $('#dots').querySelectorAll('button').forEach(b => b.addEventListener('click', e => { e.stopPropagation(); tampil(+b.dataset.i); }));
+}
+
+function chip(){
+  const c = $('#chip'); c.className = status;
+  let t;
+  if (status === 'live') t = `Langsung · diperbarui ${jamStr(waktuData)}`;
+  else if (status === 'offline') t = `Offline · data ${jamStr(waktuData)}`;
+  else t = `DATA CONTOH · ${galat || 'belum tersambung'}`;
+  $('#chipTeks').textContent = t.length > 70 ? t.slice(0, 68) + '…' : t;
+  c.title = galat || '';
+}
+
+function terapkan(d, st, waktu){
+  d = normal(d);
+  const sig = JSON.stringify(d, (k, v) => k === 'dibuat' ? undefined : v);
+  const berubah = sig !== sigLama; sigLama = sig;
+  data = d; status = st; waktuData = waktu || (d.dibuat ? new Date(d.dibuat) : new Date());
+  const pertama = !vis.length, idLama = vis[idx] && vis[idx].id;
+  vis = SCENES.filter(s => s.aktif(data));
+  const j = vis.findIndex(s => s.id === idLama); idx = j >= 0 ? j : 0;
+  bangunDots(); chip();
+  if (pertama) tampil(0); else if (berubah) tampil(idx, {tetap:true});
+  else document.querySelectorAll('#dots button')[idx]?.classList.add('on');
+}
+
+/* ================= AMBIL DATA ================= */
+const CK = 'nursery_tv_cache_v1';
+function muatCache(){ try { const c = JSON.parse(localStorage.getItem(CK)); return c && c.data ? c : null; } catch (e) { return null; } }
+function simpanCache(d){ try { localStorage.setItem(CK, JSON.stringify({data:d, waktu:new Date().toISOString()})); } catch (e) {} }
+
+async function ambil(){
+  if (CONFIG.DEMO || !CONFIG.API_URL) { galat = CONFIG.DEMO ? 'mode contoh (?demo=1)' : 'alamat data belum diisi'; terapkan(dataContoh(), 'demo'); return; }
+  const url = CONFIG.API_URL + (CONFIG.API_URL.includes('?') ? '&' : '?') + 'tv=1' + (CONFIG.KUNCI ? '&k=' + encodeURIComponent(CONFIG.KUNCI) : '') + '&t=' + Date.now();
+  const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), CONFIG.TIMEOUT * 1000);
+  try {
+    const r = await fetch(url, {signal: ctl.signal, redirect: 'follow'});
+    const teks = await r.text(); clearTimeout(to);
+    let j; try { j = JSON.parse(teks); } catch (e) { throw new Error('Respons bukan JSON: kode TV_Nursery belum terpasang atau deployment belum versi baru'); }
+    if (!j.ok) throw new Error(j.error || 'Respons tidak valid');
+    galat = ''; simpanCache(j); terapkan(j, 'live', new Date());
+  } catch (e) {
+    clearTimeout(to);
+    galat = e.name === 'AbortError' ? 'Waktu tunggu habis' : (e.message || 'Gagal terhubung');
+    if (data && status !== 'demo') { status = 'offline'; chip(); return; }
+    const c = muatCache();
+    if (c) terapkan(c.data, 'offline', new Date(c.waktu));
+    else terapkan(dataContoh(), 'demo');
+  }
+}
+
+/* ================= KONTROL ================= */
+function fit(){ const s = Math.min(innerWidth / 1920, innerHeight / 1080); $('#stage').style.transform = `translate(-50%,-50%) scale(${s})`; }
+function toast(t){ const el = $('#toast'); el.textContent = t; el.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('on'), 5000); }
+function togelJeda(){
+  jeda = !jeda; document.body.classList.toggle('jeda', jeda);
+  if (jeda) sisa = performance.now() - mulai; else mulai = performance.now() - sisa;
+}
+function layarPenuh(){
+  try { if (document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen(); }
+  catch (e) { toast('Layar penuh tidak tersedia di browser ini. Coba tombol F11.'); }
+}
+addEventListener('keydown', e => {
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  const k = e.key;
+  if (k === 'ArrowRight' || k === 'PageDown' || k === 'n') tampil(idx + 1);
+  else if (k === 'ArrowLeft' || k === 'PageUp' || k === 'p') tampil(idx - 1);
+  else if (k === ' ') { e.preventDefault(); togelJeda(); }
+  else if (k === 'f' || k === 'F') layarPenuh();
+  else if (k === 'r' || k === 'R') { toast('Menyegarkan data…'); ambil(); }
+  else if (/^[1-9]$/.test(k) && vis[+k - 1]) tampil(+k - 1);
+});
+$('#stage').addEventListener('click', e => {
+  const r = $('#stage').getBoundingClientRect(), x = (e.clientX - r.left) / r.width;
+  if (e.target.closest('#foot')) return;
+  if (x < 0.3) tampil(idx - 1); else if (x > 0.7) tampil(idx + 1); else togelJeda();
+});
+let sepiT; const bangun = () => { document.body.classList.remove('sepi'); clearTimeout(sepiT); sepiT = setTimeout(() => document.body.classList.add('sepi'), 3000); };
+addEventListener('mousemove', bangun); addEventListener('touchstart', bangun, {passive:true}); bangun();
+addEventListener('resize', fit);
+addEventListener('online', ambil);
+
+/* ================= JAM & PEWAKTU ================= */
+function detak(){
+  const n = new Date();
+  $('#jam').textContent = n.toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit', timeZone:TZ});
+  $('#tgl').textContent = n.toLocaleDateString('id-ID', {weekday:'long', day:'numeric', month:'long', year:'numeric', timeZone:TZ});
+}
+setInterval(detak, 1000); detak();
+
+setInterval(() => {
+  if (!vis.length) return;
+  const lewat = jeda ? sisa : performance.now() - mulai;
+  $('#progbar').style.width = Math.min(100, lewat / (CONFIG.DURASI * 10)) + '%';
+  if (!jeda && lewat >= CONFIG.DURASI * 1000) tampil(idx + 1);
+}, 100);
+
+/* ================= MULAI ================= */
+fit();
+ambil();
+setInterval(ambil, CONFIG.REFRESH * 1000);
+})();
+</script>
+</body>
+</html>
