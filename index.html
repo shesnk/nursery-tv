@@ -294,12 +294,14 @@ body.jeda #jedaChip{display:block}
 /* ===== LTI ===== */
 .lti{display:grid;grid-template-columns:1fr 560px;gap:24px;height:100%}
 .lti .hero{display:flex;flex-direction:column;justify-content:center;padding:40px 56px;position:relative;overflow:hidden}
-.lti .hero .n{font-size:300px;font-weight:800;line-height:.9;letter-spacing:-.04em;color:var(--green)}
+.lti .hero .n{font-size:300px;font-weight:800;line-height:.9;letter-spacing:-.04em;color:var(--green);white-space:nowrap}
+.lti .thn{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px;position:relative}
+.lti .thn span{background:rgba(30,146,89,.12);color:var(--green);font-weight:800;font-size:20px;border-radius:999px;padding:8px 18px}
 .lti .hero .s1{font-size:44px;font-weight:800;margin-top:10px}
 .lti .hero .s2{font-size:26px;color:var(--muted);margin-top:8px}
 .lti .hero .daun{position:absolute;right:-190px;bottom:-200px;opacity:.06}
 .mil{display:flex;flex-direction:column;justify-content:center;align-items:center;gap:22px;text-align:center}
-.mil .m{font-size:26px;color:var(--muted)}
+.mil .m{font-size:26px;color:var(--muted);line-height:1.45}
 .mil .m b{color:var(--ink)}
 /* ===== KPI ===== */
 .kpi{display:flex;flex-direction:column;gap:16px;margin-top:20px}
@@ -753,22 +755,27 @@ function rTanam(d){
     <div style="display:flex;flex-direction:column;gap:24px"><div class="card st-big pnl rise" style="--i:2;flex:1"><div class="lab">Total ditanam</div><div class="d num" data-count="${tb}">0</div><div class="w">batang bibit</div></div>
     <div class="card st-big pnl rise" style="--i:3;flex:1"><div class="lab">Luas ditanami</div><div class="d num">${tl.toLocaleString('id-ID',{maximumFractionDigits:1})}</div><div class="w">hektare · ${fmt(d.tanam.length)} lokasi</div></div></div></div>`;
 }
-const MIL = [30,50,100,200,365,500,730,1000,1500,2000];
 function rLti(){
-  const t = cfg.umum.lti, s = -sisaHari(t), nx = MIL.find(m => m > s) || (Math.ceil((s+1)/500)*500), pv = [...MIL].reverse().find(m => m <= s) || 0;
-  const pr = (s - pv) / (nx - pv) * 100;
-  return `<div class="lti"><div class="card hero rise"><div class="lab" style="font-size:22px">Hari tanpa kecelakaan kerja (LTI)</div>
-    <div class="n num" data-count="${s}">0</div><div class="s1">hari berturut-turut</div><div class="s2">Sejak ${fmtTgl(t)} · terus jaga, utamakan keselamatan</div>
+  const t = cfg.umum.lti, s = -sisaHari(t), h = hariIni(), y = h.getFullYear();
+  const awal = new Date(y, 0, 1), akhir = new Date(y, 11, 31), totalHari = Math.round((akhir - awal) / 864e5) + 1;
+  const hariKe = Math.round((h - awal) / 864e5) + 1, sisaTahun = totalHari - hariKe;
+  const thFatal = +String(t).slice(0, 4), gagal = thFatal === y;
+  const pr = gagal ? 0 : hariKe / totalHari * 100;
+  const fs = String(fmt(s)).length <= 3 ? 300 : (String(fmt(s)).length <= 5 ? 230 : 180);
+  const thn = []; for (let a = Math.max(thFatal + 1, y - 3); a < y; a++) thn.push(a);
+  return `<div class="lti"><div class="card hero rise"><div class="lab" style="font-size:22px">Hari tanpa fatality</div>
+    <div class="n num" data-count="${s}" style="font-size:${fs}px">0</div><div class="s1">hari berturut-turut tanpa fatality</div><div class="s2">Sejak ${fmtTgl(t)} · terus jaga, utamakan keselamatan</div>
+    ${thn.length ? `<div class="thn">${thn.map(a => `<span>✓ ${a} zero fatality</span>`).join('')}</div>` : ''}
     <svg class="daun" width="520" height="520" viewBox="0 0 24 24" fill="${P().masuk}" aria-hidden="true"><path d="M12 2l8 3v6c0 5-3.5 9.5-8 11-4.5-1.5-8-6-8-11V5z"/></svg></div>
-    <div class="card pnl mil rise" style="--i:2"><div class="lab">Menuju target berikutnya</div>${cincinBesar(pr, nx)}
-    <div class="m">Tinggal <b class="num">${fmt(nx - s)} hari</b> lagi menuju <b>${fmt(nx)} hari</b></div></div></div>`;
+    <div class="card pnl mil rise" style="--i:2"><div class="lab">Target ${gagal ? y + 1 : y}: zero fatality</div>${cincinTahun(pr, gagal ? y + 1 : y)}
+    <div class="m">${gagal ? `Target tahun ${y} tidak tercapai.<br>Mulai lagi <b>1 Januari ${y + 1}</b>` : `<b>${Math.round(pr)}%</b> tahun ${y} sudah dilalui tanpa fatality<br>Tinggal <b class="num">${fmt(sisaTahun)} hari</b> lagi menuju akhir tahun`}</div></div></div>`;
 }
-function cincinBesar(pr, nx){
+function cincinTahun(pr, th){
   const R = 150, C = 2*Math.PI*R, len = C*Math.max(0,Math.min(100,pr))/100;
   return `<svg width="360" height="360" viewBox="0 0 360 360" aria-hidden="true"><circle cx="180" cy="180" r="${R}" fill="none" stroke="${P().track}" stroke-width="30"/>
     <circle class="seg" cx="180" cy="180" r="${R}" fill="none" stroke="${P().masuk}" stroke-width="30" stroke-linecap="round" stroke-dasharray="${len} ${C-len}" transform="rotate(-90 180 180)" style="--c:${C}"/>
-    <text x="180" y="176" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-size="74" font-weight="800" fill="${P().ink}">${fmt(nx)}</text>
-    <text x="180" y="220" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-size="24" fill="${P().muted}">hari</text></svg>`;
+    <text x="180" y="148" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-size="21" font-weight="800" letter-spacing="3" fill="${P().muted}">ZERO FATALITY</text>
+    <text x="180" y="226" text-anchor="middle" font-family="Plus Jakarta Sans, sans-serif" font-size="70" font-weight="800" fill="${P().ink}">${th}</text></svg>`;
 }
 function kpiData(d){
   return cfg.target.map(t => { const r = d.deptBulan.find(o => o.nama.toLowerCase() === String(t.dept).toLowerCase()) || {hazard:0, inspeksi:0};
@@ -864,7 +871,7 @@ const SCENES = [
   {app:'nursery', id:'galeri', judul:'Galeri Kegiatan', aktif:d=>d.galeri.length>0, render:rGaleri, sebelum(){ galPos += CONFIG.GALERI_PER_LAYAR; }},
   {app:'nursery', id:'agenda', judul:'Agenda Rutin', aktif:d=>d.agenda.length>0, render:rAgenda, internal:true},
   {app:'nursery', id:'siklus', judul:'Siklus & K3 Nursery', aktif:()=>true, render:rSiklus},
-  {app:'k3', id:'k3lti', judul:'Hari Tanpa Kecelakaan', aktif:()=>sisaHari(cfg.umum.lti)!==null && sisaHari(cfg.umum.lti)<=0, render:rLti},
+  {app:'k3', id:'k3lti', judul:'Hari Tanpa Fatality', aktif:()=>sisaHari(cfg.umum.lti)!==null && sisaHari(cfg.umum.lti)<=0, render:rLti},
   {app:'k3', id:'k3tren', judul:'Hazard & Inspeksi', aktif:d=>d.tren.some(t=>t.hazard||t.inspeksi), render:rK3Tren},
   {app:'k3', id:'k3sebaran', judul:'Sebaran Hazard', aktif:d=>d.perDept.length>0||d.perJenis.length>0, render:rK3Sebaran},
   {app:'k3', id:'k3kpi', judul:'Pencapaian KPI', aktif:()=>cfg.target.length>0, render:rKpi, internal:true},
@@ -983,7 +990,7 @@ function rTicker(){
   if (n) { n.info.forEach(p => it.push(p.teks)); n.kegiatan.slice(0,2).forEach(x => it.push(`${x.kegiatan}${x.sub?' ('+x.sub+')':''}${x.total?': '+fmt(x.total)+' batang':''} · ${fmtTgl(x.tanggal)}`));
     if (n.stok.perJenis[0]) it.push(`Stok bibit terbanyak: ${n.stok.perJenis.slice(0,3).map(o => o.jenis+' '+fmt(o.stok)).join(' · ')}`); }
   if (cfg.umum.teks) it.unshift(cfg.umum.teks);
-  if (data.k3 && sisaHari(cfg.umum.lti) !== null && sisaHari(cfg.umum.lti) <= 0) it.push(`${fmt(-sisaHari(cfg.umum.lti))} hari tanpa kecelakaan kerja`);
+  if (data.k3 && sisaHari(cfg.umum.lti) !== null && sisaHari(cfg.umum.lti) <= 0) it.push(`${fmt(-sisaHari(cfg.umum.lti))} hari tanpa fatality`);
   it.push('Utamakan keselamatan, jaga lingkungan.');
   const run = $('#tkRun'); run.innerHTML = it.map(esc).join('<em>●</em>');
   run.style.animationDuration = Math.max(30, run.textContent.length*0.16) + 's';
@@ -1018,7 +1025,7 @@ const CK = a => 'tv_cache_' + a;
 function muatCache(a){ try { const c = JSON.parse(localStorage.getItem(CK(a))); return c && c.data ? c : null; } catch (e) { return null; } }
 function simpanCache(a, d){ try { localStorage.setItem(CK(a), JSON.stringify({data:d, waktu:new Date().toISOString()})); } catch (e) {} }
 async function ambilApp(a){
-  if (CONFIG.HANYA && CONFIG.HANYA !== a) return;
+  if (CONFIG.HANYA && CONFIG.HANYA !== a && a !== 'nursery') return; // Nursery tetap diambil untuk pengaturan
   const url0 = CONFIG.API[a];
   if (CONFIG.DEMO) { galat[a] = 'mode contoh'; const c = CONTOH[a]();
     if (a === 'nursery') { let p = null; try { p = JSON.parse(localStorage.getItem(CFGK)); } catch (e) {} c.pengaturan = p || contohPengaturan(); }
@@ -1101,7 +1108,7 @@ function rPanel(){
       <div class="trow"><div>Mode tamu<small>Sembunyikan layar internal saat ada kunjungan</small></div><button type="button" class="sw" role="switch" aria-checked="${!!draft.umum.tamu}" aria-label="Mode tamu" data-act="tamu"></button></div>
       <div class="trow"><div>Durasi bawaan<small>Untuk layar yang tidak diatur khusus</small></div><div class="dur"><button type="button" class="bt" data-act="durB-">−</button><span>${durB}s</span><button type="button" class="bt" data-act="durB+">+</button></div></div>
       <div class="fld"><label for="fTeks">Teks berjalan tambahan</label><input id="fTeks" type="text" maxlength="160" value="${esc(draft.umum.teks||'')}" placeholder="Contoh: Selamat datang tim penilai PROPER"></div>
-      <div class="fld"><label for="fLti">Tanggal kecelakaan kerja terakhir (LTI)</label><input id="fLti" type="date" value="${esc(draft.umum.lti||'')}"></div>
+      <div class="fld"><label for="fLti">Tanggal fatality terakhir</label><input id="fLti" type="date" value="${esc(draft.umum.lti||'')}"></div>
       <div class="sh-foot" style="padding:0;border:0;margin-top:auto"><span class="info">Target KPI &amp; jadwal pelaporan diisi di sheet <b>TV_Target</b> dan <b>TV_Jadwal</b>.</span></div>
     </div></div>
     <div class="sh-foot"><button type="button" class="bt big" data-act="bawaan">Kembalikan bawaan</button><span class="info" id="infoSimpan"></span><button type="button" class="bt big pri" data-act="simpan">Simpan &amp; terapkan</button></div>`;
